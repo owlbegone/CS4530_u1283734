@@ -52,16 +52,7 @@ fun thisView(myVM: ThisViewModel)
     val departmentText by myVM.vDepartmentInput.collectAsState()
     val numberText by myVM.vNumberInput.collectAsState()
     val locationText by myVM.vLocationInput.collectAsState()
-    var selectedCourseToString = ""
-    // If the selected course is not null, convert it to a string to display
-    if(selectedCourse != null)
-    {
-        selectedCourseToString = selectedCourse?.department + " " + selectedCourse?.number + " " + selectedCourse?.location
-    }
-    // Otherwise display 'no course selected.'
-    else{
-        selectedCourseToString = "No course selected."
-    }
+    val selectedCourseToString by myVM.vCourseString.collectAsState()
 
     // Text/Text fields are all in one column:
     Column(
@@ -100,23 +91,7 @@ fun thisView(myVM: ThisViewModel)
         // This is the add course button; if any of the fields are empty, display "missing information
         // in the error text.
         Button(
-            onClick = {
-                if(departmentText != "" &&
-                    numberText != "" &&
-                    locationText != "")
-                {
-                    if(numberText.toIntOrNull() != null)
-                    {
-                        // Otherwise, add a course.
-                        myVM.addCourse(departmentText, numberText.toInt(), locationText)
-                    }
-                    else{
-                        myVM.showError("Not a valid course number!")
-                    }
-                }
-                else{
-                    myVM.showError("Missing information!")
-                }
+            onClick = {myVM.addCourse(departmentText, numberText, locationText)
             })
         {
             Text(text = "Add Course")
@@ -131,15 +106,7 @@ fun thisView(myVM: ThisViewModel)
         // This is the delete button; it displays an error instead if there is no selected course.
         Button(
             onClick = {
-                if(selectedCourse != null)
-                {
-                    myVM.deleteCourse(selectedCourse)
-                }
-                else
-                {
-                    myVM.showError("No selected course to delete.")
-                }
-                }
+                myVM.deleteCourse(selectedCourse)}
         )
         {
             Text(text = "Delete Selected Course")
@@ -161,7 +128,8 @@ fun thisView(myVM: ThisViewModel)
         else
         {
             items(items = courses, itemContent = { item ->
-                Button(onClick = { myVM.selectCourse(item)}) {
+                Button(onClick = { myVM.selectCourse(item)
+                myVM.courseToString(item)}) {
                     Text(item.department + " " + item.number, style = TextStyle(fontSize = 20.sp))
                 }
             })

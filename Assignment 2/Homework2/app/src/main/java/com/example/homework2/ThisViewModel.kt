@@ -33,6 +33,9 @@ class ThisViewModel : ViewModel() {
     private val mError = MutableStateFlow("")
     val vError: StateFlow<String> = mError
 
+    private val mCourseString = MutableStateFlow("")
+    val vCourseString: StateFlow<String> = mCourseString
+
     // This is called when the text field for department changes
     fun onDepartmentChange(input: String) {
         mDepartmentInput.value = input
@@ -55,31 +58,61 @@ class ThisViewModel : ViewModel() {
     }
 
     // This is called when the addCourse button is called with proper parameters
-    fun addCourse(department: String, number: Int, location: String) {
-        val newCourse = Course(department, number, location)
-        mCourseList.value = mCourseList.value + newCourse
-        // This resets the text fields
-        mDepartmentInput.value = ""
-        mNumberInput.value = ""
-        mLocationInput.value = ""
+    fun addCourse(department: String, number: String, location: String) {
+        if(department != "" &&
+            number != "" &&
+            location != "")
+        {
+            if(number.toIntOrNull() != null)
+            {
+                val newCourse = Course(department, number.toInt(), location)
+                mCourseList.value = mCourseList.value + newCourse
+                // This resets the text fields
+                mDepartmentInput.value = ""
+                mNumberInput.value = ""
+                mLocationInput.value = ""
+            }
+            else{
+                mError.value = "Invalid course number!"
+            }
+        }
+        else{
+            mError.value = "Missing course information!"
+        }
     }
 
-    // This is called when an error occurs
-    fun showError(error: String) {
-        mError.value = error
-    }
+//    // This is called when an error occurs
+//    fun showError(error: String) {
+//        mError.value = error
+//    }
 
     // This is called when the deleteCourse button is called with the proper parameters.
     fun deleteCourse(course: Course?)
     {
-        val tempList = mCourseList.value.toMutableList()
-        tempList.remove(course)
-        mCourseList.value = tempList
-        if(mSelectedCourse.value?.department == course?.department &&
-            mSelectedCourse.value?.number == course?.number &&
-            mSelectedCourse.value?.location == course?.location)
+        if(course == null)
         {
+            mError.value = "No selected course to delete!"
+        }
+        else
+        {
+            val tempList = mCourseList.value.toMutableList()
+            tempList.remove(course)
+            mCourseList.value = tempList
             mSelectedCourse.value = null
+            mError.value = "Course deleted!"
+            mCourseString.value = ""
+        }
+    }
+
+    fun courseToString(course: Course?)
+    {
+        if(course == null)
+        {
+            mCourseString.value = ""
+        }
+        else
+        {
+            mCourseString.value = course.department + " " + course.number + " " + course.location
         }
     }
 }
