@@ -1,0 +1,1 @@
+NOTE: The folder is called Homework 2 because it's an extension of my Assignment 2 project, and I didn't want to risk messing up the project by trying to refactor/rename.
