@@ -9,6 +9,7 @@ import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -52,25 +53,35 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.flow.Flow
 
 class MainActivity : ComponentActivity() {
+
+    private var thisVM: A5ViewModel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val myVM: A5ViewModel by viewModels { GravViewModelProvider.Factory }
+        thisVM = myVM
 
         setContent {
-            //val myVM: A5ViewModel by viewModels { GravViewModelProvider.Factory }
             // The composable function here
-            MarbleScreen()
+            MarbleScreen(myVM)
         }
     }
 
     override fun onResume() {
         super.onResume()
+        thisVM?.enableSensor()
+        Log.d("RESUME", "onResume() is being executed!")
+    }
 
+    override fun onPause() {
+        super.onPause()
+        thisVM?.disableSensor()
+        Log.d("PAUSE", "onPause() is being executed!")
     }
 }
 
-@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-fun MarbleScreen(vm: A5ViewModel = viewModel(factory = GravViewModelProvider.Factory)) {
+fun MarbleScreen(vm: A5ViewModel) {
     val gravReading by vm.gravReading.collectAsStateWithLifecycle()
     val xPos by vm.xReadOnly.collectAsState()
     val yPos by vm.yReadOnly.collectAsState()

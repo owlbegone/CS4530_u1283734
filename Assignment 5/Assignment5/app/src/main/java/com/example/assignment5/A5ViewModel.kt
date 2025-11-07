@@ -84,6 +84,14 @@ class A5ViewModel(private val repository: GravityRepository) : ViewModel() {
         xBoundMutable.value = x
         yBoundMutable.value = y
     }
+
+    fun enableSensor() {
+        repository.enableSensor()
+    }
+
+    fun disableSensor() {
+        repository.disableSensor()
+    }
 }
 
 object GravViewModelProvider {
